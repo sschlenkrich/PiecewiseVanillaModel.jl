@@ -1,0 +1,13 @@
+name = "PiecewiseVanillaModel"
+uuid = "2871cd80-17e4-4ef4-9e92-1aa15777f3b2"
+authors = ["Sebastian Schlenkrich"]
+version = "0.0.1"
+
+[compat]
+julia = "1.6.7"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
