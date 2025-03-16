@@ -12,6 +12,15 @@
 #
 
 
+"""
+    black_implied_volatility(price, strike, forward, T, call_put)
+
+Calculate the Black or log-normal implied volatility.
+
+`price` is the forward or undiscounted option price, `strike` is the option strike,
+`forward` is the forward asset price or expectation of factor, `T` is time to option
+expiry, and `call_put` encodes call (`+1`) or put (`-1`) options.
+"""
 function black_implied_volatility(price, strike, forward, T, call_put)
     isCall = (call_put==1.0)
     df = 1.0

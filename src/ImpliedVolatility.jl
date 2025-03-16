@@ -1,4 +1,9 @@
 
+"""
+    lognormal_volatility(m::Model, strike)
+
+Calculate the Black or log-normal implied volatility for a given model.
+"""
 function lognormal_volatility(m::Model, strike)
     if strike ≥ m.s0
         cp = 1.0
@@ -12,6 +17,11 @@ function lognormal_volatility(m::Model, strike)
 end
 
 
+"""
+    normal_volatility(m::Model, strike)
+
+Calculate the Bachelier or normal implied volatility for a given model.
+"""
 function normal_volatility(m::Model, strike)
     if strike ≥ m.s0
         cp = 1.0

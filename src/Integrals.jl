@@ -1,4 +1,10 @@
 
+"""
+    vanilla_option_integral(m::Model, strike, payoff, call_or_put)
+
+Calculate the option price for a generic `payoff` function using
+numerical integration via `quadgk(...)`.
+"""
 function vanilla_option_integral(m::Model, strike, payoff, call_or_put)
     @assert call_or_put in (-1.0, 1.0)
     w0 = brownian_factor(m, strike)
@@ -15,12 +21,25 @@ function vanilla_option_integral(m::Model, strike, payoff, call_or_put)
 end
 
 
+"""
+    cum_dist(m::Model, s)
+
+Calculate the implied cumulative distribution function for a
+risk factor level `s`.
+"""
 function cum_dist(m::Model, s)
     w = brownian_factor(m, s)
     return cdf(Normal(), w / sqrt(m.T))
 end
 
 
+"""
+    integral_one(w, s0, v0, w0, T, r)
+
+Calculate anti-derivative for `S(w)`.
+
+This is an internal method used vor call and put option calculation.
+"""
 function integral_one(w, s0, v0, w0, T, r)
     z = w / sqrt(T)
     if abs(r) < r_ε
@@ -36,6 +55,13 @@ function integral_one(w, s0, v0, w0, T, r)
 end
 
 
+"""
+    integral_two(w, s0, v0, w0, T, r)
+
+Calculate anti-derivative for `S(w)^2`.
+
+This is an internal method used vor power option calculation.
+"""
 function integral_two(w, s0, v0, w0, T, r)
     z = w / sqrt(T)
     if abs(r) < r_ε
@@ -56,6 +82,12 @@ end
 
 const Z_∞ = 10.0  # Φ(Z_∞) = 1
 
+
+"""
+    call_option(m::Model, strike)
+
+Calculate a call option for a given (out-of-the-money) strike.
+"""
 function call_option(m::Model, strike)
     @assert strike ≥ m.s0
     intrinsic_value = max(m.s0 - strike, 0.0)
@@ -91,6 +123,11 @@ function call_option(m::Model, strike)
 end
 
 
+"""
+    put_option(m::Model, strike)
+
+Calculate a put option for a given (out-of-the-money) strike.
+"""
 function put_option(m::Model, strike)
     @assert strike ≤ m.s0
     intrinsic_value = max(strike - m.s0, 0.0)
@@ -129,6 +166,11 @@ function put_option(m::Model, strike)
 end
 
 
+"""
+    power_call_option(m::Model, strike)
+
+Calculate a power call option for a given (out-of-the-money) strike.
+"""
 function power_call_option(m::Model, strike)
     @assert strike ≥ m.s0
     intrinsic_value = 0.0  # out-of-the-money
@@ -166,6 +208,11 @@ function power_call_option(m::Model, strike)
 end
 
 
+"""
+    power_put_option(m::Model, strike)
+
+Calculate a power put option for a given (out-of-the-money) strike.
+"""
 function power_put_option(m::Model, strike)
     @assert strike ≤ m.s0
     intrinsic_value = 0.0  # out-of-the-money
@@ -206,6 +253,11 @@ function power_put_option(m::Model, strike)
 end
 
 
+"""
+    variance(m::Model)
+
+Calculate the model-implied variance of the risk factor.
+"""
 function variance(m::Model)
     return power_put_option(m, m.s0) + power_call_option(m, m.s0)
 end

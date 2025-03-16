@@ -4,6 +4,11 @@ const Model = NamedTuple  # an alias
 const r_ε = 1.0e-8  # r -> 0, avoid division by zero
 
 
+"""
+    brownian_grid(v0, ds, dv)
+
+Calculate the grid of auxiliary parameters at model creation.
+"""
 function brownian_grid(v0, ds, dv)
     @assert length(ds) == length(dv)
     dw = zeros(0)
@@ -28,6 +33,35 @@ function brownian_grid(v0, ds, dv)
 end
 
 
+"""
+    model(s0, v0, w0, T, dsl, dsu, dvl, dvu; rexl = 0.0, rexu = 0.0)
+
+Create a model from direct inputs and without calibration.
+
+Model attributes are as follows:
+
+`s0` is the forward risk factor (at-the-money level).
+
+`v0` is the volatility parameter at `s0`.
+
+`w0` is the auxiliary parameter at `s0`.
+
+`T` is the time to option expiry.
+
+`dsl` is a vector of relative reference strikes for lower smile; Actual strikes are `sl = s0 - dsl`.
+
+`dsu` is a vector of relative reference strikes for upper smile; Actual strikes are `su = s0 + dsu`.
+
+`dvl` is a vector of volatility parameter offsets for lower smile; Actual volatility is `vl = v0 + dvl`.
+
+`dvu` is a vector of volatility parameter offsets for upper smile; Actual volatility is `vu = v0 + dvu`.
+
+`rexl` is the outward slope of the lower extrapolation smile; log-normal model uses `rexl < 0`.
+If `rexl == nothing` then slope is calculated via linear extrapolation.
+
+`rexu` is the outward slope of the upper extrapolation smile; log-normal model uses `rexl > 0`.
+If `rexu == nothing` then slope is calculated via linear extrapolation.
+"""
 function model(s0, v0, w0, T, dsl, dsu, dvl, dvu; rexl = 0.0, rexu = 0.0)
     @assert v0 > 0.0
     @assert T > 0.0

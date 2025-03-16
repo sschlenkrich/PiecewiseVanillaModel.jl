@@ -2,6 +2,15 @@
 
 _Φ_tilde(x) = cdf(Normal(), x) + pdf(Normal(), x) / x
 
+"""
+    bachelier_implied_volatility(price, strike, forward, T, call_put)
+
+Calculate the Bachelier or normal implied volatility.
+
+`price` is the forward or undiscounted option price, `strike` is the option strike,
+`forward` is the forward asset price or expectation of factor, `T` is time to option
+expiry, and `call_put` encodes call (`+1`) or put (`-1`) options.
+"""
 function bachelier_implied_volatility(price, strike, forward, T, call_put)
     # P. Jäckel, Implied Normal Volatility, 2017
     if isapprox(strike, forward)  # ATM option

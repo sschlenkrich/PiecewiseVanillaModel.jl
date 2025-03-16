@@ -1,4 +1,9 @@
 
+"""
+    initial_values(idx, v0, ds, dv, dw, r_extrapolation)
+
+Derive the model parameters for a segment specified by the index `idx`. 
+"""
 function initial_values(idx, v0, ds, dv, dw, r_extrapolation)
     if idx == 0
         dw0 = 0.0
@@ -23,6 +28,14 @@ function initial_values(idx, v0, ds, dv, dw, r_extrapolation)
 end
 
 
+"""
+    risk_factor(dw_, v0, ds, dv, dw, r_extrapolation)
+
+Calculate the risk factor S from a given auxiliary parameter w.
+
+This is an internal method. Auxiliary parameter and resulting risk factor are
+represented relative to ATM.
+"""
 function risk_factor(dw_, v0, ds, dv, dw, r_extrapolation)
     @assert dw_ ≥ 0.0
     @assert length(ds) == length(dv)
@@ -39,6 +52,14 @@ function risk_factor(dw_, v0, ds, dv, dw, r_extrapolation)
 end
 
 
+"""
+    brownian_factor(ds_, v0, ds, dv, dw, r_extrapolation)
+
+Calculate the auxiliary parameter w from a given risk factor S.
+
+This is an internal method. Risk factor and resulting auxiliary parameter are
+represented relative to ATM.
+"""
 function brownian_factor(ds_, v0, ds, dv, dw, r_extrapolation)
     @assert ds_ ≥ 0.0
     @assert length(ds) == length(dv)
@@ -60,6 +81,11 @@ function brownian_factor(ds_, v0, ds, dv, dw, r_extrapolation)
 end
 
 
+"""
+    risk_factor(m::Model, w)
+
+Calculate the risk factor S from a given auxiliary parameter w.
+"""
 function risk_factor(m::Model, w)
     if w ≥ m.w0
         dw = w - m.w0
@@ -73,6 +99,11 @@ function risk_factor(m::Model, w)
 end
 
 
+"""
+    brownian_factor(m::Model, s)
+
+Calculate the auxiliary parameter w from a given risk factor S.
+"""
 function brownian_factor(m::Model, s)
     if s ≥ m.s0
         ds = s - m.s0
@@ -86,6 +117,11 @@ function brownian_factor(m::Model, s)
 end
 
 
+"""
+    local_volatility(ds_, v0, ds, dv, dw, r_extrapolation)
+
+Calculate interpolated volatility parameters.
+"""
 function local_volatility(ds_, v0, ds, dv, dw, r_extrapolation)
     @assert ds_ ≥ 0.0
     @assert length(ds) == length(dv)
@@ -97,6 +133,11 @@ function local_volatility(ds_, v0, ds, dv, dw, r_extrapolation)
 end
 
 
+"""
+    local_volatility(m::Model, s)
+
+Calculate interpolated volatility parameters.
+"""
 function local_volatility(m::Model, s)
     if s ≥ m.s0
         ds = s - m.s0
@@ -110,6 +151,11 @@ function local_volatility(m::Model, s)
 end
 
 
+"""
+    implied_density(m::Model, s)
+
+Calculate model-implied probability density for a given risk factor value.
+"""
 function implied_density(m::Model, s)
     w = brownian_factor(m, s)
     v = local_volatility(m, s)

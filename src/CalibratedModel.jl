@@ -1,6 +1,11 @@
 
 const v_ε = 1.0e-8  # ensure positive volatility parameters
 
+"""
+    positive_volatilities(v0, dv)
+
+Check for resulting positive volatilities and floor volatilities if necessary.
+"""
 function positive_volatilities(v0, dv)
     if (v0 .≥ v_ε) && all(v0 .+ dv .≥ v_ε)
         return (v0, dv)
@@ -28,6 +33,25 @@ function _calibrated_model_F(x, m0, σ_atm, atm_vega)
     return [ y1, y2 ]
 end
 
+"""
+    calibrated_model(
+        s_atm,
+        σ_atm,
+        T,
+        dsl,
+        dsu,
+        dvl,
+        dvu;
+        rexl  = 0.0,
+        rexu  = 0.0,
+        σ_tol = 1.0e-10,
+        k_max = 10,
+        l_max = 5,
+        backtracking_factor = 0.5,
+        )
+
+Create a model which is auto-calibrated to at-the-money forward and normal volatility.
+"""
 function calibrated_model(
     s_atm,
     σ_atm,
@@ -94,6 +118,24 @@ function calibrated_model(
     return _adjusted_model(x, m0)
 end
 
+"""
+    calibrated_model_from_slopes(
+        s_atm,
+        σ_atm,
+        T,
+        std_devs_lo,
+        std_devs_up,
+        slope_lo,
+        slope_up,
+        rexl,
+        rexu,
+        )
+
+Create an ATM-calibrated model from relative/normalised reference strike
+and volatility slope increments.
+
+This method is used internally for smile calibration.
+"""
 function calibrated_model_from_slopes(
     s_atm,
     σ_atm,
@@ -144,6 +186,42 @@ function _calibrated_model_from_smile_F(x, size_lo, s_atm, σ_atm, T, std_devs_l
     return F_vols
 end
 
+"""
+    calibrated_model_from_smile(
+        s_atm,
+        σ_atm,
+        T,
+        std_devs_lo,
+        std_devs_up,
+        rel_strikes,
+        σ_smiles;
+        rexl  = 0.0,
+        rexu  = 0.0,
+        α = 0.0,
+        σ_min = 1.0e-4,
+        lmfit_kwargs = (
+            autodiff = :forwarddiff,
+            maxIter  = 10
+        ),
+        )
+
+Create a model that is calibrated to a set of strikes and implied normal volatilities.
+
+Input implied normal volatilities are `σ_smiles`. Corresponding strikes are `rel_strikes`.
+Strikes are represented as off-set to at-the-money (ATM) forward `s_atm`.
+
+ATM implied normal volatility is `σ_atm`. Time to option expiry is `T`.
+
+Lower and upper reference strikes are represented by `std_devs_lo` and `std_devs_up`.
+The reference strikes are expressed in terms of standard deviations from ATM. Transformation
+into actual strikes is implemented via the scaling `σ_atm*sqrt(T)`.
+
+Lower and upper smile extrapolation is controlled via the slope parameters `rexlo` and
+`rexu`.
+
+The calibration method is controlled via the named tuple `lmfit_kwargs`. The arguments
+are passed on to the `LsqFit.lmfit(...)` method.
+"""
 function calibrated_model_from_smile(
     s_atm,
     σ_atm,
