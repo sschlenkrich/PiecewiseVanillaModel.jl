@@ -1,0 +1,13 @@
+# Create environment via
+# conda env create -f environment.yml
+name: piecewise-vanilla-model
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - ipykernel
+  - jupyter
+  - python
+  - numpy
+  - plotly
+  - scipy
