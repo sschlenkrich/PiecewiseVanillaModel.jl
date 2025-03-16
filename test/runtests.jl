@@ -2,5 +2,11 @@ using PiecewiseVanillaModel
 using Test
 
 @testset "PiecewiseVanillaModel.jl" begin
-    # Write your tests here.
+
+    include("risk_factor_function.jl")
+    include("integrals.jl")
+    include("vanilla_options.jl")
+    include("power_options.jl")
+    include("calibrated_model.jl")
+
 end
