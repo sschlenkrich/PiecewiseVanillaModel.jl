@@ -1,0 +1,3 @@
+[deps]
+PiecewiseVanillaModel = "2871cd80-17e4-4ef4-9e92-1aa15777f3b2"
+PlotlyJS = "f0f68f2c-4968-5e81-91da-67840de0976a"
