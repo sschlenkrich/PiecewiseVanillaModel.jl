@@ -183,6 +183,70 @@ pvm = PiecewiseVanillaModel
             # println("Converged: " * string(res.converged))
         end
 
+    @testset "Calibrated log-normal model" begin
+        S0 = 1.00
+        T = 2.0
+        absolute_strikes = [ 0.50, 0.75, 0.90, 1.10, 1.50, 2.00 ]
+        #
+        sigma_b76_atm = 0.30
+        sigma_b76_smile = [ 0.30, 0.30, 0.30, 0.30, 0.30, 0.30 ]
+        #
+        sigma_n_atm = pvm.normal_volatility(sigma_b76_atm, S0, S0, T)
+        sigma_n_smile = [
+            pvm.normal_volatility(v, K, S0, T)
+            for (v, K) in zip(sigma_b76_smile, absolute_strikes)
+        ]
+        #
+        relative_strikes = absolute_strikes .- S0
+        #
+        stdevs_lower_smile = [ 0.5, 1.0 ]
+        stdevs_upper_smile = [ 0.5, 1.0 ]
+        #
+        res_1 = pvm.calibrated_model_from_smile(
+            S0, sigma_n_atm, T,
+            stdevs_lower_smile, stdevs_upper_smile,
+            relative_strikes, sigma_n_smile,
+            rexl = nothing,
+            rexu = nothing,
+        )
+        res_2 = pvm.calibrated_model_from_smile(
+            S0, sigma_n_atm, T,
+            stdevs_lower_smile, stdevs_upper_smile,
+            relative_strikes, sigma_n_smile,
+            rexl = "LINEAR",
+            rexu = "LINEAR",
+        )
+        res_3 = pvm.calibrated_model_from_smile(
+            S0, sigma_n_atm, T,
+            stdevs_lower_smile, stdevs_upper_smile,
+            relative_strikes, sigma_n_smile,
+            rexl = "LOGNORMAL",
+            rexu = "LOGNORMAL",
+        )
+        m = res_2.model
+        m_4 = pvm.calibrated_model(
+            S0, sigma_n_atm, T,
+            m.dsl, m.dsu, m.dvl, m.dvu,
+            rexl = "LOGNORMAL",
+            rexu = "LOGNORMAL",
+        )
+        #
+        @test abs.(res_1.model.v0 - 0.30) < 1.0e-10
+        @test abs.(res_2.model.v0 - 0.30) < 1.0e-10
+        @test abs.(res_3.model.v0 - 0.30) < 1.0e-10
+        @test abs.(m_4.v0         - 0.30) < 1.0e-10
+        #
+        test_strikes = 0.30:0.10:3.00
+        v1 = [ pvm.lognormal_volatility(res_1.model, s) for s in test_strikes ]
+        v2 = [ pvm.lognormal_volatility(res_2.model, s) for s in test_strikes ]
+        v3 = [ pvm.lognormal_volatility(res_3.model, s) for s in test_strikes ]
+        v4 = [ pvm.lognormal_volatility(m_4, s) for s in test_strikes ]
+        #
+        @test maximum(abs.(v1 .- 0.30)) < 1.0e-10
+        @test maximum(abs.(v2 .- 0.30)) < 1.0e-10
+        @test maximum(abs.(v3 .- 0.30)) < 1.0e-10
+        @test maximum(abs.(v4 .- 0.30)) < 1.0e-10
+    end
 
     end
 

@@ -17,7 +17,11 @@ function initial_values(idx, v0, ds, dv, dw, r_extrapolation)
         if idx < length(dv)
             r_ = (dv[idx+1] - dv[idx]) / (ds[idx+1] - ds[idx])
         else
-            r_ = r_extrapolation
+            if !isnothing(r_extrapolation)
+                r_ = r_extrapolation
+            else
+                return initial_values(idx-1, v0, ds, dv, dw, r_extrapolation)
+            end
         end
     end
     return (dw0, ds0, v0 + dv_, r_)

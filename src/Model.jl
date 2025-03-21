@@ -106,12 +106,7 @@ end
 Set slope based on linear extrapolation.
 """
 function _extrapolation_slope(s0, v0, ds, dv, r_extrapolation::Nothing, upp_or_low)
-    if length(ds) > 1
-        rex = (dv[end] - dv[end-1]) / (ds[end] - ds[end-1])
-    else
-        rex = dv[end] / ds[end]
-    end
-    return rex
+    return r_extrapolation
 end
 
 """
@@ -123,8 +118,16 @@ function _extrapolation_slope(s0, v0, ds, dv, r_extrapolation::String, upp_or_lo
     if uppercase(r_extrapolation) == "FLAT"
         return _extrapolation_slope(s0, v0, ds, dv, 0.0, upp_or_low)
     end
-    if uppercase(r_extrapolation) == "LINEAR"
+    if uppercase(r_extrapolation) == "NOTHING"
         return _extrapolation_slope(s0, v0, ds, dv, nothing, upp_or_low)
+    end
+    if uppercase(r_extrapolation) == "LINEAR"
+        if length(ds) > 1
+            rex = (dv[end] - dv[end-1]) / (ds[end] - ds[end-1])
+        else
+            rex = dv[end] / ds[end]
+        end
+        return rex
     end
     if uppercase(r_extrapolation) == "LOGNORMAL"
         @assert upp_or_low in (-1.0, 1.0)

@@ -15,17 +15,17 @@ function positive_volatilities(v0, dv)
     return (v0_, dv_)
 end
 
-function _adjusted_model(x, m0)
+function _adjusted_model(x, m0, rexl, rexu)
     w0 = 0.5 * x[1] * m0.T  # w0 = 0.5*r0*T
     v0 = exp(x[2])  # ensure positivity
     (v0, dvl) = positive_volatilities(v0, m0.dvl)
     (v0, dvu) = positive_volatilities(v0, m0.dvu)
-    return model(m0.s0, v0, w0, m0.T, m0.dsl, m0.dsu, dvl, dvu, rexl = m0.rexl, rexu = m0.rexu)
+    return model(m0.s0, v0, w0, m0.T, m0.dsl, m0.dsu, dvl, dvu, rexl = rexl, rexu = rexu)
 end
 
 
-function _calibrated_model_F(x, m0, σ_atm, atm_vega)
-    m = _adjusted_model(x, m0)
+function _calibrated_model_F(x, m0, σ_atm, atm_vega, rexl, rexu)
+    m = _adjusted_model(x, m0, rexl, rexu)
     c = call_option(m, m.s0)
     p = put_option(m, m.s0)
     y1 = (c - p) / atm_vega
@@ -92,7 +92,7 @@ function calibrated_model(
     (v0, dvl) = positive_volatilities(v0, dvl)
     (v0, dvu) = positive_volatilities(v0, dvu)
     m0 = model(s_atm, v0, w0, T, dsl, dsu, dvl, dvu, rexl = rexl, rexu = rexu)
-    F(x) = _calibrated_model_F(x, m0, σ_atm, atm_vega)
+    F(x) = _calibrated_model_F(x, m0, σ_atm, atm_vega, rexl, rexu)
     x = [ r0, log(v0) ]
     y = F(x)
     for k = 1:k_max
@@ -115,7 +115,7 @@ function calibrated_model(
             y = F(x)
         end
     end
-    return _adjusted_model(x, m0)
+    return _adjusted_model(x, m0, rexl, rexu)
 end
 
 """
