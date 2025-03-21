@@ -70,6 +70,22 @@ function model(s0, v0, w0, T, dsl, dsu, dvl, dvu; rexl = 0.0, rexu = 0.0)
     # TODO: test monotonicity of S-grids, positivity of v
     dwl = brownian_grid(v0, dsl, dvl)
     dwu = brownian_grid(v0, dsu, dvu)
+    #
+    if isnothing(rexl)  # low-strike extrapolation
+        if length(dsl) > 1
+            rexl = (dvl[end] - dvl[end-1]) / (dsl[end] - dsl[end-1])
+        else
+            rexl = dvl[end] / dsl[end]
+        end
+    end
+    if isnothing(rexu)  # high-strike extrapolation
+        if length(dsu) > 1
+            rexu = (dvu[end] - dvu[end-1]) / (dsu[end] - dsu[end-1])
+        else
+            rexu = dvu[end] / dsu[end]
+        end
+    end
+    #
     return (
         s0  = s0,
         v0  = v0,
