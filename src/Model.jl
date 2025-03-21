@@ -71,20 +71,8 @@ function model(s0, v0, w0, T, dsl, dsu, dvl, dvu; rexl = 0.0, rexu = 0.0)
     dwl = brownian_grid(v0, dsl, dvl)
     dwu = brownian_grid(v0, dsu, dvu)
     #
-    if isnothing(rexl)  # low-strike extrapolation
-        if length(dsl) > 1
-            rexl = (dvl[end] - dvl[end-1]) / (dsl[end] - dsl[end-1])
-        else
-            rexl = dvl[end] / dsl[end]
-        end
-    end
-    if isnothing(rexu)  # high-strike extrapolation
-        if length(dsu) > 1
-            rexu = (dvu[end] - dvu[end-1]) / (dsu[end] - dsu[end-1])
-        else
-            rexu = dvu[end] / dsu[end]
-        end
-    end
+    rexl = _extrapolation_slope(s0, v0, dsl, dvl, rexl, -1.0)
+    rexu = _extrapolation_slope(s0, v0, dsu, dvu, rexu, +1.0)
     #
     return (
         s0  = s0,
@@ -100,4 +88,51 @@ function model(s0, v0, w0, T, dsl, dsu, dvl, dvu; rexl = 0.0, rexu = 0.0)
         rexl = rexl,
         rexu = rexu,
     )
+end
+
+
+"""
+    _extrapolation_slope(s0, v0, ds, dv, r_extrapolation::Number, upp_or_low)
+
+Set slope based on explicit value.
+"""
+function _extrapolation_slope(s0, v0, ds, dv, r_extrapolation::Number, upp_or_low)
+    return r_extrapolation
+end
+
+"""
+    _extrapolation_slope(s0, v0, ds, dv, r_extrapolation::Nothing, upp_or_low)
+
+Set slope based on linear extrapolation.
+"""
+function _extrapolation_slope(s0, v0, ds, dv, r_extrapolation::Nothing, upp_or_low)
+    if length(ds) > 1
+        rex = (dv[end] - dv[end-1]) / (ds[end] - ds[end-1])
+    else
+        rex = dv[end] / ds[end]
+    end
+    return rex
+end
+
+"""
+    _extrapolation_slope(s0, v0, ds, dv, r_extrapolation::String, upp_or_low)
+
+Decide slope based on string value.
+"""
+function _extrapolation_slope(s0, v0, ds, dv, r_extrapolation::String, upp_or_low)
+    if uppercase(r_extrapolation) == "FLAT"
+        return _extrapolation_slope(s0, v0, ds, dv, 0.0, upp_or_low)
+    end
+    if uppercase(r_extrapolation) == "LINEAR"
+        return _extrapolation_slope(s0, v0, ds, dv, nothing, upp_or_low)
+    end
+    if uppercase(r_extrapolation) == "LOGNORMAL"
+        @assert upp_or_low in (-1.0, 1.0)
+        s = s0 + upp_or_low * ds[end]
+        @assert s > 0.0
+        v = v0 + dv[end]
+        rex = upp_or_low * v / s
+        return rex
+    end
+    return 0.0 # fall-back
 end
