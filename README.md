@@ -98,7 +98,7 @@ pvm.lognormal_volatility(res.model, S0)
 
 This returns `0.30`, which was also an input to the calibration.
 
-It turns out that the calibrated model in this example is a log-normal model with log-normal volatility of $30\%$. This can be verified by inspecting the model attributes.
+It turns out that the calibrated model in this example is a log-normal model with log-normal volatility of 30%. This can be verified by inspecting the model attributes.
 
 ```
 res.model.v0
