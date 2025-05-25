@@ -10,7 +10,7 @@ The PiecewiseVanillaModel.jl package implements a static model for the pricing a
 
 The model is based on a piece-wise specification of the terminal distribution of the underlying financial risk factor.
 
-Details of the model are discussed in (TBD).
+Details of the model are discussed in [S. Schlenkrich, A Piece-wise Model for Vanilla Option Pricing](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5214566).
 
 ## Installation
 

@@ -9,5 +9,6 @@ dependencies:
   - jupyter
   - python
   - numpy
+  - pandas
   - plotly
   - scipy
