@@ -65,9 +65,16 @@ If `rexu == nothing` then slope is calculated via linear extrapolation.
 function model(s0, v0, w0, T, dsl, dsu, dvl, dvu; rexl = 0.0, rexu = 0.0)
     @assert v0 > 0.0
     @assert T > 0.0
+    @assert length(dsl) > 0  # we may relax this constraint
+    @assert length(dsu) > 0
     @assert length(dsl) == length(dvl)
     @assert length(dsu) == length(dvu)
-    # TODO: test monotonicity of S-grids, positivity of v
+    for k in 2:length(dsl)
+        @assert dsl[k] > dsl[k-1]
+    end
+    for k in 2:length(dsu)
+        @assert dsu[k] > dsu[k-1]
+    end
     dwl = brownian_grid(v0, dsl, dvl)
     dwu = brownian_grid(v0, dsu, dvu)
     #
