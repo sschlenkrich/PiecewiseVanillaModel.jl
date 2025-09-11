@@ -158,7 +158,7 @@ pvm = PiecewiseVanillaModel
         dens = [
             pvm.implied_density(m, s_) for s_ in s
         ]
-        display(dens)
+        # display(dens)
         #
         m = pvm.calibrated_model(s_atm, σ_atm, T, dsl, dsu, dvl, dvu, rexl = nothing, rexu = nothing)
         lv = [
@@ -192,7 +192,7 @@ pvm = PiecewiseVanillaModel
         dens = [
             pvm.implied_density(m, s_) for s_ in s
         ]
-        display(dens)
+        # display(dens)
     end
 
 

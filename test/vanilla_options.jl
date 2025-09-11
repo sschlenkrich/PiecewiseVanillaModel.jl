@@ -18,12 +18,16 @@ pvm = PiecewiseVanillaModel
         m2 = pvm.model(s0, v0, w0, T, dsl, dsu, dvl, dvu, rexl = nothing, rexu = nothing)
         #
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            c_tst_1 = pvm.call_option(m1, s0 + ds)
-            c_tst_2 = pvm.call_option(m2, s0 + ds)
+            c_tst_1 = pvm.call_put_option(m1, s0 + ds, 1)
+            c_tst_2 = pvm.call_put_option(m2, s0 + ds, 1)
+            c_tst_3 = pvm.call_option_analytic(m1, s0 + ds)
+            c_tst_4 = pvm.call_option_analytic(m2, s0 + ds)
             c_ref = pvm.bachelier_price(s0 + ds, s0, v0, T, 1.0)
             c_num = pvm.vanilla_option_integral(m1, s0 + ds, (s)->(s-(s0 + ds)), 1.0)
             @test isapprox(c_tst_1, c_ref, atol=1.0e-10)
             @test isapprox(c_tst_2, c_ref, atol=1.0e-10)
+            @test isapprox(c_tst_3, c_ref, atol=1.0e-10)
+            @test isapprox(c_tst_4, c_ref, atol=1.0e-10)
             @test isapprox(c_num,   c_ref, atol=1.0e-10)
             # println(c_tst)
             # println(c_ref)
@@ -47,10 +51,12 @@ pvm = PiecewiseVanillaModel
         λ = v0/r - s0
         #
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            c_tst = pvm.call_option(m, s0 + ds)
+            c_tst_1 = pvm.call_put_option(m, s0 + ds, 1)
+            c_tst_2 = pvm.call_option_analytic(m, s0 + ds)
             c_ref = pvm.black_price(s0 + ds + λ, s0 + λ, r, T, 1.0)
             c_num = pvm.vanilla_option_integral(m, s0 + ds, (s)->(s-(s0 + ds)), 1.0)
-            @test isapprox(c_tst, c_ref, atol=1.0e-10)
+            @test isapprox(c_tst_1, c_ref, atol=1.0e-10)
+            @test isapprox(c_tst_2, c_ref, atol=1.0e-10)
             @test isapprox(c_num, c_ref, atol=1.0e-10)
             # println(c_tst)
             # println(c_ref)
@@ -75,12 +81,16 @@ pvm = PiecewiseVanillaModel
         λ = v0/r - s0
         #
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            c_tst_1 = pvm.call_option(m1, s0 + ds)
-            c_tst_2 = pvm.call_option(m2, s0 + ds)
+            c_tst_1 = pvm.call_put_option(m1, s0 + ds, 1)
+            c_tst_2 = pvm.call_put_option(m2, s0 + ds, 1)
+            c_tst_3 = pvm.call_option_analytic(m1, s0 + ds)
+            c_tst_4 = pvm.call_option_analytic(m2, s0 + ds)
             c_ref = pvm.black_price(s0 + ds + λ, s0 + λ, r, T, 1.0)
             c_num = pvm.vanilla_option_integral(m2, s0 + ds, (s)->(s-(s0 + ds)), 1.0)
             @test isapprox(c_tst_1, c_ref, atol=1.0e-10)
             @test isapprox(c_tst_2, c_ref, atol=1.0e-10)
+            @test isapprox(c_tst_3, c_ref, atol=1.0e-10)
+            @test isapprox(c_tst_4, c_ref, atol=1.0e-10)
             @test isapprox(c_num, c_ref, atol=1.0e-10)
             # println(c_tst)
             # println(c_ref)
@@ -101,12 +111,16 @@ pvm = PiecewiseVanillaModel
         m2 = pvm.model(s0, v0, w0, T, dsl, dsu, dvl, dvu, rexl = nothing, rexu = nothing)
         #
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            p_tst_1 = pvm.put_option(m1, s0 - ds)
-            p_tst_2 = pvm.put_option(m2, s0 - ds)
+            p_tst_1 = pvm.call_put_option(m1, s0 - ds, -1)
+            p_tst_2 = pvm.call_put_option(m2, s0 - ds, -1)
+            p_tst_3 = pvm.put_option_analytic(m1, s0 - ds)
+            p_tst_4 = pvm.put_option_analytic(m2, s0 - ds)
             p_ref = pvm.bachelier_price(s0 - ds, s0, v0, T, -1.0)
             p_num = pvm.vanilla_option_integral(m2, s0 - ds, (s)->((s0 - ds)-s), -1.0)
             @test isapprox(p_tst_1, p_ref, atol=1.0e-10)
             @test isapprox(p_tst_2, p_ref, atol=1.0e-10)
+            @test isapprox(p_tst_3, p_ref, atol=1.0e-10)
+            @test isapprox(p_tst_4, p_ref, atol=1.0e-10)
             @test isapprox(p_num, p_ref, atol=1.0e-10)
             # println(p_tst)
             # println(p_ref)
@@ -130,10 +144,12 @@ pvm = PiecewiseVanillaModel
         λ = v0/r - s0
         #
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            p_tst = pvm.put_option(m, s0 - ds)
+            p_tst_1 = pvm.call_put_option(m, s0 - ds, -1)
+            p_tst_2 = pvm.put_option_analytic(m, s0 - ds)
             p_ref = pvm.black_price(s0 - ds + λ, s0 + λ, r, T, -1.0)
             p_num = pvm.vanilla_option_integral(m, s0 - ds, (s)->((s0 - ds)-s), -1.0)
-            @test isapprox(p_tst, p_ref, atol=1.0e-10)
+            @test isapprox(p_tst_1, p_ref, atol=1.0e-10)
+            @test isapprox(p_tst_2, p_ref, atol=1.0e-10)
             @test isapprox(p_num, p_ref, atol=1.0e-10)
             # println(p_tst)
             # println(p_ref)
@@ -158,12 +174,16 @@ pvm = PiecewiseVanillaModel
         λ = v0/r - s0
         #
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            p_tst_1 = pvm.put_option(m1, s0 - ds)
-            p_tst_2 = pvm.put_option(m2, s0 - ds)
+            p_tst_1 = pvm.call_put_option(m1, s0 - ds, -1)
+            p_tst_2 = pvm.call_put_option(m2, s0 - ds, -1)
+            p_tst_3 = pvm.put_option_analytic(m1, s0 - ds)
+            p_tst_4 = pvm.put_option_analytic(m2, s0 - ds)
             p_ref = pvm.black_price(s0 - ds + λ, s0 + λ, r, T, -1.0)
             p_num = pvm.vanilla_option_integral(m1, s0 - ds, (s)->((s0 - ds)-s), -1.0)
             @test isapprox(p_tst_1, p_ref, atol=1.0e-10)
             @test isapprox(p_tst_2, p_ref, atol=1.0e-10)
+            @test isapprox(p_tst_3, p_ref, atol=1.0e-10)
+            @test isapprox(p_tst_4, p_ref, atol=1.0e-10)
             @test isapprox(p_num, p_ref, atol=1.0e-10)
             # println(p_tst)
             # println(p_ref)
@@ -184,12 +204,16 @@ pvm = PiecewiseVanillaModel
         dvu = [ 0.0020, 0.0020, 0.0030 ]
         m = pvm.model(s0, v0, w0, T, dsl, dsu, dvl, dvu)
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            c_tst = pvm.call_option(m, s0 + ds)
-            p_tst = pvm.put_option(m, s0 - ds)
+            c_tst_1 = pvm.call_put_option(m, s0 + ds, 1)
+            c_tst_2 = pvm.call_option_analytic(m, s0 + ds)
+            p_tst_1 = pvm.call_put_option(m, s0 - ds, -1)
+            p_tst_2 = pvm.put_option_analytic(m, s0 - ds)
             c_num = pvm.vanilla_option_integral(m, s0 + ds, (s)->(s-(s0 + ds)), 1.0)
             p_num = pvm.vanilla_option_integral(m, s0 - ds, (s)->((s0 - ds)-s), -1.0)
-            @test isapprox(c_num, c_tst, atol=1.0e-10)
-            @test isapprox(p_num, p_tst, atol=1.0e-10)
+            @test isapprox(c_num, c_tst_1, atol=1.0e-10)
+            @test isapprox(c_num, c_tst_2, atol=1.0e-10)
+            @test isapprox(p_num, p_tst_1, atol=1.0e-10)
+            @test isapprox(p_num, p_tst_2, atol=1.0e-10)
             # println(c_tst)
             # println(c_num)
             # println(p_tst)
@@ -197,5 +221,34 @@ pvm = PiecewiseVanillaModel
         end
     end
 
+
+    @testset "Piece-wise model option with negative slope" begin
+        s0 = 0.03
+        v0 = 0.01
+        T = 2.0
+        r = 0.2
+        w0 = 0.5*r*T
+        dsl = [ 0.01, 0.02, 0.04, 0.05-1.0e-6 ]
+        dsu = [ 0.01, 0.02, 0.03 ]
+        dvl = -r .* dsl
+        dvu = [ 0.0020, 0.0010, 0.0000 ]
+        m = pvm.model(s0, v0, w0, T, dsl, dsu, dvl, dvu)
+        for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
+            c_tst_1 = pvm.call_put_option(m, s0 + ds, 1)
+            c_tst_2 = pvm.call_option_analytic(m, s0 + ds)
+            p_tst_1 = pvm.call_put_option(m, s0 - ds, -1)
+            p_tst_2 = pvm.put_option_analytic(m, s0 - ds)
+            c_num = pvm.vanilla_option_integral(m, s0 + ds, (s)->(s-(s0 + ds)), 1.0)
+            p_num = pvm.vanilla_option_integral(m, s0 - ds, (s)->((s0 - ds)-s), -1.0)
+            @test isapprox(c_num, c_tst_1, atol=1.0e-10)
+            @test isapprox(c_num, c_tst_2, atol=1.0e-10)
+            @test isapprox(p_num, p_tst_1, atol=1.0e-10)
+            @test isapprox(p_num, p_tst_2, atol=1.0e-10)
+            # println(c_tst)
+            # println(c_num)
+            # println(p_tst)
+            # println(p_num)
+        end
+    end
 
 end
