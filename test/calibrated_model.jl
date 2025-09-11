@@ -182,6 +182,7 @@ pvm = PiecewiseVanillaModel
             # display(fit)
             # println("Converged: " * string(res.converged))
         end
+    end
 
     @testset "Calibrated log-normal model" begin
         S0 = 1.00
@@ -246,8 +247,6 @@ pvm = PiecewiseVanillaModel
         @test maximum(abs.(v2 .- 0.30)) < 1.0e-10
         @test maximum(abs.(v3 .- 0.30)) < 1.0e-10
         @test maximum(abs.(v4 .- 0.30)) < 1.0e-10
-    end
-
     end
 
 end

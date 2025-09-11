@@ -18,8 +18,8 @@ pvm = PiecewiseVanillaModel
         m2 = pvm.model(s0, v0, w0, T, dsl, dsu, dvl, dvu, rexl = nothing, rexu = nothing)
         #
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            c_tst_1 = pvm.power_call_option(m1, s0 + ds)
-            c_tst_2 = pvm.power_call_option(m2, s0 + ds)
+            c_tst_1 = pvm.power_call_option_analytic(m1, s0 + ds)
+            c_tst_2 = pvm.power_call_option_analytic(m2, s0 + ds)
             c_num = pvm.vanilla_option_integral(m1, s0 + ds, (s)->(s-(s0 + ds))^2, 1.0)
             @test isapprox(c_tst_1, c_num, atol=1.0e-10)
             @test isapprox(c_tst_2, c_num, atol=1.0e-10)
@@ -44,8 +44,8 @@ pvm = PiecewiseVanillaModel
         λ = v0/r - s0
         #
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            c_tst_1 = pvm.power_call_option(m1, s0 + ds)
-            c_tst_2 = pvm.power_call_option(m2, s0 + ds)
+            c_tst_1 = pvm.power_call_option_analytic(m1, s0 + ds)
+            c_tst_2 = pvm.power_call_option_analytic(m2, s0 + ds)
             c_num = pvm.vanilla_option_integral(m2, s0 + ds, (s)->(s-(s0 + ds))^2, 1.0)
             @test isapprox(c_tst_1, c_num, atol=1.0e-10)
             @test isapprox(c_tst_2, c_num, atol=1.0e-10)
@@ -66,8 +66,8 @@ pvm = PiecewiseVanillaModel
         m2 = pvm.model(s0, v0, w0, T, dsl, dsu, dvl, dvu, rexl = nothing, rexu = nothing)
         #
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            p_tst_1 = pvm.power_put_option(m1, s0 - ds)
-            p_tst_2 = pvm.power_put_option(m2, s0 - ds)
+            p_tst_1 = pvm.power_put_option_analytic(m1, s0 - ds)
+            p_tst_2 = pvm.power_put_option_analytic(m2, s0 - ds)
             p_num = pvm.vanilla_option_integral(m2, s0 - ds, (s)->((s0 - ds)-s)^2, -1.0)
             @test isapprox(p_tst_1, p_num, atol=1.0e-10)
             @test isapprox(p_tst_2, p_num, atol=1.0e-10)
@@ -92,8 +92,8 @@ pvm = PiecewiseVanillaModel
         λ = v0/r - s0
         #
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            p_tst_1 = pvm.power_put_option(m1, s0 - ds)
-            p_tst_2 = pvm.power_put_option(m2, s0 - ds)
+            p_tst_1 = pvm.power_put_option_analytic(m1, s0 - ds)
+            p_tst_2 = pvm.power_put_option_analytic(m2, s0 - ds)
             p_num = pvm.vanilla_option_integral(m1, s0 - ds, (s)->((s0 - ds)-s)^2, -1.0)
             @test isapprox(p_tst_1, p_num, atol=1.0e-10)
             @test isapprox(p_tst_2, p_num, atol=1.0e-10)
@@ -113,8 +113,8 @@ pvm = PiecewiseVanillaModel
         dvu = [ 0.0020, 0.0020, 0.0030 ]
         m = pvm.model(s0, v0, w0, T, dsl, dsu, dvl, dvu)
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            c_tst = pvm.power_call_option(m, s0 + ds)
-            p_tst = pvm.power_put_option(m, s0 - ds)
+            c_tst = pvm.power_call_option_analytic(m, s0 + ds)
+            p_tst = pvm.power_put_option_analytic(m, s0 - ds)
             c_num = pvm.vanilla_option_integral(m, s0 + ds, (s)->(s-(s0 + ds))^2, 1.0)
             p_num = pvm.vanilla_option_integral(m, s0 - ds, (s)->((s0 - ds)-s)^2, -1.0)
             @test isapprox(c_num, c_tst, atol=1.0e-10)
@@ -134,7 +134,7 @@ pvm = PiecewiseVanillaModel
         dvl = [ 0.0, ]
         dvu = [ 0.0, ]
         m = pvm.model(s0, v0, w0, T, dsl, dsu, dvl, dvu, rexl = nothing, rexu = nothing)
-        σ = sqrt(pvm.variance(m) / m.T)
+        σ = sqrt(pvm.variance_analytic(m) / m.T)
         @test isapprox(σ, v0, atol=1.0e-10)
         # println("σ: ", σ)
         #
@@ -146,7 +146,7 @@ pvm = PiecewiseVanillaModel
         dvl = -r .* dsl
         dvu = r .* dsu
         m = pvm.model(s0, v0, w0, T, dsl, dsu, dvl, dvu, rexl = nothing, rexu = nothing)
-        σ = sqrt(pvm.variance(m) / m.T)
+        σ = sqrt(pvm.variance_analytic(m) / m.T)
         σ_ln = sqrt(s0^2 * (exp(r^2*T) - 1) / T)
         @test isapprox(σ, σ_ln, atol=1.0e-10)
         # println("σ: ", σ)
@@ -160,7 +160,7 @@ pvm = PiecewiseVanillaModel
         dvl = -r .* dsl
         dvu = [ 0.0020, 0.0020, 0.0030 ]
         m = pvm.calibrated_model(s_atm, σ_atm, T, dsl, dsu, dvl, dvu, rexl = nothing, rexu = 0.0)
-        σ = sqrt(pvm.variance(m) / m.T)
+        σ = sqrt(pvm.variance_analytic(m) / m.T)
         #
         c_num = pvm.vanilla_option_integral(m, s0, (s)->(s-s0)^2, 1.0)
         p_num = pvm.vanilla_option_integral(m, s0, (s)->(s0-s)^2, -1.0)
@@ -193,7 +193,7 @@ pvm = PiecewiseVanillaModel
             dvl = r .* dsl
             dvu = r .* dsl
             m = pvm.calibrated_model(s_atm, σ_atm, T, dsl, dsu, dvl, dvu, rexl = nothing, rexu = nothing)
-            σ = sqrt(pvm.variance(m) / m.T)
+            σ = sqrt(pvm.variance_analytic(m) / m.T)
             @test isapprox(σ, σ_ref[k], atol=1.0e-14)
             # println("σ: ", σ)
         end
