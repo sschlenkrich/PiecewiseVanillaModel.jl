@@ -11,8 +11,9 @@ using SpecialFunctions
 include("Model.jl")
 
 include("Helpers.jl")
-include("Integrals.jl")
 include("RiskFactorFunction.jl")
+include("Integrals.jl")
+include("CallPutOption.jl")
 include("CalibratedModel.jl")
 include("BachelierImpliedVolatility.jl")
 include("BlackImpliedVolatility.jl")
