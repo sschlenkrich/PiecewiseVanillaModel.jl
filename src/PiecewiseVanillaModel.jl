@@ -18,4 +18,7 @@ include("BachelierImpliedVolatility.jl")
 include("BlackImpliedVolatility.jl")
 include("ImpliedVolatility.jl")
 
+call_option(m::Model, strike) = call_option_analytic(m::Model, strike)
+put_option(m::Model, strike) = put_option_analytic(m::Model, strike)
+
 end

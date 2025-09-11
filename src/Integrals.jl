@@ -84,11 +84,11 @@ const Z_∞ = 10.0  # Φ(Z_∞) = 1
 
 
 """
-    call_option(m::Model, strike)
+    call_option_analytic(m::Model, strike)
 
 Calculate a call option for a given (out-of-the-money) strike.
 """
-function call_option(m::Model, strike)
+function call_option_analytic(m::Model, strike)
     @assert strike ≥ m.s0
     intrinsic_value = max(m.s0 - strike, 0.0)
     dw = brownian_factor(m, strike) - m.w0
@@ -124,11 +124,11 @@ end
 
 
 """
-    put_option(m::Model, strike)
+    put_option_analytic(m::Model, strike)
 
 Calculate a put option for a given (out-of-the-money) strike.
 """
-function put_option(m::Model, strike)
+function put_option_analytic(m::Model, strike)
     @assert strike ≤ m.s0
     intrinsic_value = max(strike - m.s0, 0.0)
     dw = m.w0 - brownian_factor(m, strike)
@@ -167,11 +167,11 @@ end
 
 
 """
-    power_call_option(m::Model, strike)
+    power_call_option_analytic(m::Model, strike)
 
 Calculate a power call option for a given (out-of-the-money) strike.
 """
-function power_call_option(m::Model, strike)
+function power_call_option_analytic(m::Model, strike)
     @assert strike ≥ m.s0
     intrinsic_value = 0.0  # out-of-the-money
     dw = brownian_factor(m, strike) - m.w0
@@ -209,11 +209,11 @@ end
 
 
 """
-    power_put_option(m::Model, strike)
+    power_put_option_analytic(m::Model, strike)
 
 Calculate a power put option for a given (out-of-the-money) strike.
 """
-function power_put_option(m::Model, strike)
+function power_put_option_analytic(m::Model, strike)
     @assert strike ≤ m.s0
     intrinsic_value = 0.0  # out-of-the-money
     dw = m.w0 - brownian_factor(m, strike)
@@ -254,10 +254,10 @@ end
 
 
 """
-    variance(m::Model)
+    variance_analytic(m::Model)
 
 Calculate the model-implied variance of the risk factor.
 """
-function variance(m::Model)
-    return power_put_option(m, m.s0) + power_call_option(m, m.s0)
+function variance_analytic(m::Model)
+    return power_put_option_analytic(m, m.s0) + power_call_option_analytic(m, m.s0)
 end
