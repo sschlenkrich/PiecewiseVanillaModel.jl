@@ -199,6 +199,8 @@ end
         rexl  = 0.0,
         rexu  = 0.0,
         α = 0.0,
+        r0l = 0.0,
+        r0u = 0.0,
         σ_min = 1.0e-4,
         lmfit_kwargs = (
             autodiff = :forwarddiff,
@@ -232,6 +234,8 @@ function calibrated_model_from_smile(
     rexl  = 0.0,
     rexu  = 0.0,
     α = 0.0,
+    r0l = 0.0,
+    r0u = 0.0,
     σ_min = 1.0e-4,
     lmfit_kwargs = (
         autodiff = :forwarddiff,
@@ -239,6 +243,8 @@ function calibrated_model_from_smile(
     ),
     )
     #
+    @assert length(dsl) > 0
+    @assert length(dsu) > 0
     @assert length(rel_strikes) ≥ 2
     @assert length(rel_strikes) == length(σ_smiles)
     @assert σ_atm ≥ σ_min
@@ -251,6 +257,9 @@ function calibrated_model_from_smile(
         rexl, rexu, α,
     )
     x0 = zeros(size(dsl).+size(dsu))
+    # we want to allow a shifted-lognormal model as initial model
+    x0[1] = r0l
+    x0[length(dsl)+1] = r0u
     y0 = F(x0)
     res = LsqFit.lmfit(
         F,
