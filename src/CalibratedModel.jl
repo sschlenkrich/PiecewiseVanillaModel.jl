@@ -123,16 +123,19 @@ end
         s_atm,
         σ_atm,
         T,
-        std_devs_lo,
-        std_devs_up,
+        dsl,
+        dsu,
         slope_lo,
         slope_up,
         rexl,
         rexu,
         )
 
-Create an ATM-calibrated model from relative/normalised reference strike
-and volatility slope increments.
+Create an ATM-calibrated model from volatility slope increments.
+
+This method implements a re-parametrisation of the volatility
+parameters `dvl` and `dvu`. Smaller values for `slope_lo` and
+`slope_up` reduce kinks in volatility parameters.
 
 This method is used internally for smile calibration.
 """
@@ -140,18 +143,16 @@ function calibrated_model_from_slopes(
     s_atm,
     σ_atm,
     T,
-    std_devs_lo,
-    std_devs_up,
+    dsl,
+    dsu,
     slope_lo,
     slope_up,
     rexl,
     rexu,
     )
     #
-    @assert length(std_devs_lo) == length(slope_lo)
-    @assert length(std_devs_up) == length(slope_up)
-    dsl = σ_atm * sqrt(T) * std_devs_lo
-    dsu = σ_atm * sqrt(T) * std_devs_up
+    @assert length(dsl) == length(slope_lo)
+    @assert length(dsu) == length(slope_up)
     #
     slope_lo = cumsum(slope_lo)
     slope_up = cumsum(slope_up)
@@ -165,12 +166,12 @@ function calibrated_model_from_slopes(
 end
 
 
-function _model_from_x(x, size_lo, s_atm, σ_atm, T, std_devs_lo, std_devs_up, rexl, rexu)
-    return calibrated_model_from_slopes(s_atm, σ_atm, T, std_devs_lo, std_devs_up, x[begin:size_lo], x[size_lo+1:end], rexl, rexu)
+function _model_from_x(x, size_lo, s_atm, σ_atm, T, dsl, dsu, rexl, rexu)
+    return calibrated_model_from_slopes(s_atm, σ_atm, T, dsl, dsu, x[begin:size_lo], x[size_lo+1:end], rexl, rexu)
 end
 
-function _calibrated_model_from_smile_F(x, size_lo, s_atm, σ_atm, T, std_devs_lo, std_devs_up, rel_strikes, σ_smiles, rexl, rexu, α)
-    m = _model_from_x(x, size_lo, s_atm, σ_atm, T, std_devs_lo, std_devs_up, rexl, rexu)
+function _calibrated_model_from_smile_F(x, size_lo, s_atm, σ_atm, T, dsl, dsu, rel_strikes, σ_smiles, rexl, rexu, α)
+    m = _model_from_x(x, size_lo, s_atm, σ_atm, T, dsl, dsu, rexl, rexu)
     σ_model = [
         normal_volatility(m, rel_strike + m.s0) for rel_strike in rel_strikes
     ]
@@ -191,8 +192,8 @@ end
         s_atm,
         σ_atm,
         T,
-        std_devs_lo,
-        std_devs_up,
+        dsl,
+        dsu,
         rel_strikes,
         σ_smiles;
         rexl  = 0.0,
@@ -212,9 +213,7 @@ Strikes are represented as off-set to at-the-money (ATM) forward `s_atm`.
 
 ATM implied normal volatility is `σ_atm`. Time to option expiry is `T`.
 
-Lower and upper reference strikes are represented by `std_devs_lo` and `std_devs_up`.
-The reference strikes are expressed in terms of standard deviations from ATM. Transformation
-into actual strikes is implemented via the scaling `σ_atm*sqrt(T)`.
+Lower and upper reference strikes are represented by `dsl` and `dsu`.
 
 Lower and upper smile extrapolation is controlled via the slope parameters `rexlo` and
 `rexu`.
@@ -226,8 +225,8 @@ function calibrated_model_from_smile(
     s_atm,
     σ_atm,
     T,
-    std_devs_lo,
-    std_devs_up,
+    dsl,
+    dsu,
     rel_strikes,
     σ_smiles;
     rexl  = 0.0,
@@ -246,13 +245,12 @@ function calibrated_model_from_smile(
     @assert all(σ_smiles .≥ σ_min)
     F(x) = _calibrated_model_from_smile_F(
         x,
-        length(std_devs_lo),
-        s_atm, σ_atm, T,
-        std_devs_lo, std_devs_up,
+        length(dsl),
+        s_atm, σ_atm, T, dsl, dsu,
         rel_strikes, σ_smiles,
         rexl, rexu, α,
     )
-    x0 = zeros(size(std_devs_lo).+size(std_devs_up))
+    x0 = zeros(size(dsl).+size(dsu))
     y0 = F(x0)
     res = LsqFit.lmfit(
         F,
@@ -261,6 +259,6 @@ function calibrated_model_from_smile(
         lmfit_kwargs...
     )
         #
-    m = _model_from_x(res.param, length(std_devs_lo), s_atm, σ_atm, T, std_devs_lo, std_devs_up, rexl, rexu)
+    m = _model_from_x(res.param, length(dsl), s_atm, σ_atm, T, dsl, dsu, rexl, rexu)
     return (model = m, result = res)
 end
