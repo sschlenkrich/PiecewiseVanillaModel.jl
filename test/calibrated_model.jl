@@ -159,9 +159,10 @@ pvm = PiecewiseVanillaModel
         )
         # for T in [ 1.0/12, ]
         for T in [ 1.0/12, 0.5, 1.0, 5.0, 10.0 ]
+            ν2 = σ_atm * sqrt(T)
             (m, res) = pvm.calibrated_model_from_smile(
                 s_atm, σ_atm, T,
-                std_devs_lo, std_devs_up,
+                std_devs_lo * ν2, std_devs_up * ν2,
                 rel_strikes, σ_smiles;
                 rexl = nothing, rexu = nothing,
                 α=α, lmfit_kwargs = lmfit_kwargs,
@@ -200,26 +201,23 @@ pvm = PiecewiseVanillaModel
         #
         relative_strikes = absolute_strikes .- S0
         #
-        stdevs_lower_smile = [ 0.5, 1.0 ]
-        stdevs_upper_smile = [ 0.5, 1.0 ]
+        dsl = [ 0.5, 1.0 ] * sigma_n_atm * sqrt(T)
+        dsu = [ 0.5, 1.0 ] * sigma_n_atm * sqrt(T)
         #
         res_1 = pvm.calibrated_model_from_smile(
-            S0, sigma_n_atm, T,
-            stdevs_lower_smile, stdevs_upper_smile,
+            S0, sigma_n_atm, T, dsl, dsu,
             relative_strikes, sigma_n_smile,
             rexl = nothing,
             rexu = nothing,
         )
         res_2 = pvm.calibrated_model_from_smile(
-            S0, sigma_n_atm, T,
-            stdevs_lower_smile, stdevs_upper_smile,
+            S0, sigma_n_atm, T, dsl, dsu,
             relative_strikes, sigma_n_smile,
             rexl = "LINEAR",
             rexu = "LINEAR",
         )
         res_3 = pvm.calibrated_model_from_smile(
-            S0, sigma_n_atm, T,
-            stdevs_lower_smile, stdevs_upper_smile,
+            S0, sigma_n_atm, T, dsl, dsu,
             relative_strikes, sigma_n_smile,
             rexl = "LOGNORMAL",
             rexu = "LOGNORMAL",
