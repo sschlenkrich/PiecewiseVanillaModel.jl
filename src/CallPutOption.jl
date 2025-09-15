@@ -64,7 +64,7 @@ function call_put_option_recursive(m::Model, strike, call_or_put)
 end
 
 
-function call_put_option(m::Model, strike, call_or_put)
+function call_put_option_black(m::Model, strike, call_or_put)
     @assert call_or_put in (-1, 1)
     # We only model ATM and OTM options. And for ATM we need an additional flag
     @assert (call_or_put != 1)  || (strike ≥ m.s0)  # call => K ≥ S0
