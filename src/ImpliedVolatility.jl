@@ -46,3 +46,16 @@ function normal_volatility(b76_volatility, strike, forward, T)
     v = bachelier_implied_volatility(o, strike, forward, T, cp)
     return v
 end
+
+
+"""
+    lognormal_volatility(norm_volatility, strike, forward, T)
+
+Calculate Black or log-normal implied volatility from Bachelier or normal volatility
+"""
+function lognormal_volatility(norm_volatility, strike, forward, T)
+    cp = (strike ≥ forward) ? 1.0 : -1.0
+    o = bachelier_price(strike, forward, norm_volatility*sqrt(T), cp)
+    v = black_implied_volatility(o, strike, forward, T, cp)
+    return v
+end
