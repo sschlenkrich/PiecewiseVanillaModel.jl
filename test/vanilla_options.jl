@@ -18,8 +18,8 @@ pvm = PiecewiseVanillaModel
         m2 = pvm.model(s0, v0, w0, T, dsl, dsu, dvl, dvu, rexl = nothing, rexu = nothing)
         #
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            c_tst_1 = pvm.call_put_option(m1, s0 + ds, 1)
-            c_tst_2 = pvm.call_put_option(m2, s0 + ds, 1)
+            c_tst_1 = pvm.call_put_option_black(m1, s0 + ds, 1)
+            c_tst_2 = pvm.call_put_option_black(m2, s0 + ds, 1)
             c_tst_3 = pvm.call_option_analytic(m1, s0 + ds)
             c_tst_4 = pvm.call_option_analytic(m2, s0 + ds)
             c_ref = pvm.bachelier_price(s0 + ds, s0, v0, T, 1.0)
@@ -51,7 +51,7 @@ pvm = PiecewiseVanillaModel
         λ = v0/r - s0
         #
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            c_tst_1 = pvm.call_put_option(m, s0 + ds, 1)
+            c_tst_1 = pvm.call_put_option_black(m, s0 + ds, 1)
             c_tst_2 = pvm.call_option_analytic(m, s0 + ds)
             c_ref = pvm.black_price(s0 + ds + λ, s0 + λ, r, T, 1.0)
             c_num = pvm.vanilla_option_integral(m, s0 + ds, (s)->(s-(s0 + ds)), 1.0)
@@ -81,8 +81,8 @@ pvm = PiecewiseVanillaModel
         λ = v0/r - s0
         #
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            c_tst_1 = pvm.call_put_option(m1, s0 + ds, 1)
-            c_tst_2 = pvm.call_put_option(m2, s0 + ds, 1)
+            c_tst_1 = pvm.call_put_option_black(m1, s0 + ds, 1)
+            c_tst_2 = pvm.call_put_option_black(m2, s0 + ds, 1)
             c_tst_3 = pvm.call_option_analytic(m1, s0 + ds)
             c_tst_4 = pvm.call_option_analytic(m2, s0 + ds)
             c_ref = pvm.black_price(s0 + ds + λ, s0 + λ, r, T, 1.0)
@@ -111,8 +111,8 @@ pvm = PiecewiseVanillaModel
         m2 = pvm.model(s0, v0, w0, T, dsl, dsu, dvl, dvu, rexl = nothing, rexu = nothing)
         #
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            p_tst_1 = pvm.call_put_option(m1, s0 - ds, -1)
-            p_tst_2 = pvm.call_put_option(m2, s0 - ds, -1)
+            p_tst_1 = pvm.call_put_option_black(m1, s0 - ds, -1)
+            p_tst_2 = pvm.call_put_option_black(m2, s0 - ds, -1)
             p_tst_3 = pvm.put_option_analytic(m1, s0 - ds)
             p_tst_4 = pvm.put_option_analytic(m2, s0 - ds)
             p_ref = pvm.bachelier_price(s0 - ds, s0, v0, T, -1.0)
@@ -144,7 +144,7 @@ pvm = PiecewiseVanillaModel
         λ = v0/r - s0
         #
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            p_tst_1 = pvm.call_put_option(m, s0 - ds, -1)
+            p_tst_1 = pvm.call_put_option_black(m, s0 - ds, -1)
             p_tst_2 = pvm.put_option_analytic(m, s0 - ds)
             p_ref = pvm.black_price(s0 - ds + λ, s0 + λ, r, T, -1.0)
             p_num = pvm.vanilla_option_integral(m, s0 - ds, (s)->((s0 - ds)-s), -1.0)
@@ -174,8 +174,8 @@ pvm = PiecewiseVanillaModel
         λ = v0/r - s0
         #
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            p_tst_1 = pvm.call_put_option(m1, s0 - ds, -1)
-            p_tst_2 = pvm.call_put_option(m2, s0 - ds, -1)
+            p_tst_1 = pvm.call_put_option_black(m1, s0 - ds, -1)
+            p_tst_2 = pvm.call_put_option_black(m2, s0 - ds, -1)
             p_tst_3 = pvm.put_option_analytic(m1, s0 - ds)
             p_tst_4 = pvm.put_option_analytic(m2, s0 - ds)
             p_ref = pvm.black_price(s0 - ds + λ, s0 + λ, r, T, -1.0)
@@ -204,9 +204,9 @@ pvm = PiecewiseVanillaModel
         dvu = [ 0.0020, 0.0020, 0.0030 ]
         m = pvm.model(s0, v0, w0, T, dsl, dsu, dvl, dvu)
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            c_tst_1 = pvm.call_put_option(m, s0 + ds, 1)
+            c_tst_1 = pvm.call_put_option_black(m, s0 + ds, 1)
             c_tst_2 = pvm.call_option_analytic(m, s0 + ds)
-            p_tst_1 = pvm.call_put_option(m, s0 - ds, -1)
+            p_tst_1 = pvm.call_put_option_black(m, s0 - ds, -1)
             p_tst_2 = pvm.put_option_analytic(m, s0 - ds)
             c_num = pvm.vanilla_option_integral(m, s0 + ds, (s)->(s-(s0 + ds)), 1.0)
             p_num = pvm.vanilla_option_integral(m, s0 - ds, (s)->((s0 - ds)-s), -1.0)
@@ -234,9 +234,9 @@ pvm = PiecewiseVanillaModel
         dvu = [ 0.0020, 0.0010, 0.0000 ]
         m = pvm.model(s0, v0, w0, T, dsl, dsu, dvl, dvu)
         for ds in [ 0.0, 0.005, 0.01, 0.022, 0.035 ]
-            c_tst_1 = pvm.call_put_option(m, s0 + ds, 1)
+            c_tst_1 = pvm.call_put_option_black(m, s0 + ds, 1)
             c_tst_2 = pvm.call_option_analytic(m, s0 + ds)
-            p_tst_1 = pvm.call_put_option(m, s0 - ds, -1)
+            p_tst_1 = pvm.call_put_option_black(m, s0 - ds, -1)
             p_tst_2 = pvm.put_option_analytic(m, s0 - ds)
             c_num = pvm.vanilla_option_integral(m, s0 + ds, (s)->(s-(s0 + ds)), 1.0)
             p_num = pvm.vanilla_option_integral(m, s0 - ds, (s)->((s0 - ds)-s), -1.0)
