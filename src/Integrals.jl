@@ -261,3 +261,18 @@ Calculate the model-implied variance of the risk factor.
 function variance_analytic(m::Model)
     return power_put_option_analytic(m, m.s0) + power_call_option_analytic(m, m.s0)
 end
+
+
+"""
+    call_put_option_analytic(m::Model, strike, call_or_put)
+
+Calculate a call or put option for a given (out-of-the-money) strike.
+"""
+function call_put_option_analytic(m::Model, strike, call_or_put)
+    @assert call_or_put in (-1, 1)
+    if call_or_put == 1
+        return call_option_analytic(m, strike)
+    else
+        return put_option_analytic(m, strike)
+    end
+end
