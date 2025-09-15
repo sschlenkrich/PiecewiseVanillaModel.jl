@@ -8,5 +8,6 @@ using Test
     include("vanilla_options.jl")
     include("power_options.jl")
     include("calibrated_model.jl")
+    include("jaeckel_example.jl")
 
 end
