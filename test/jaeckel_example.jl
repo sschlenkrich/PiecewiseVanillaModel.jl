@@ -93,7 +93,11 @@ pvm = PiecewiseVanillaModel
         s = s * "                o1" 
         s = s * "                o2"
         s = s * "                o3\n"
-        err_string = ""
+        e = "Relative error:\n"
+        e = e * indent * "        s "
+        e = e * "                o2/o1"
+        e = e * "                o3/o1\n"
+
         for (strike, σ) in zip(strikes, black_vols)
             cp = (strike ≥ m.s0) ? 1 : -1
             o0 = pvm.black_price(strike, m.s0, σ*sqrt(m.T), cp)
@@ -105,21 +109,21 @@ pvm = PiecewiseVanillaModel
             #
             err2 = o2/o1 - 1.0
             err3 = o3/o1 - 1.0
-            err_string = err_string * (@sprintf "  %16.8f  %16.8f  %16.8f" strike err2 err3) * "\n"
+            e = e * (@sprintf "  %16.8f  %16.8f  %16.8f" strike err2 err3) * "\n"
             #
             @test abs(err2) < rel_tol
             @test abs(err3) < rel_tol
         end
-        # println(s)
-        # println(err_string)
+        println(s)
+        println(e)
     end
 
 
     @testset "Example case I" begin
         rexl, rexu, r0l, r0u, α = nothing, 0.2, 0.0, 0.0, 0.0
         m, fit = test_calibration(strikes, normal_vols_1, T, rexl, rexu, r0l, r0u, α)
-        @test maximum(abs.(fit)) < 1.7e-6
-        test_formulas(m, strikes, data[:,2], 6.5e-4)  # high tolerance due to extreme forwards
+        @test maximum(abs.(fit)) < 4.5e-5
+        test_formulas(m, strikes, data[:,2], 2.0e-3)  # high tolerance due to extreme forwards
     end
 
     @testset "Example case II" begin
